@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <title>{% block title%} {% endblock %}</title>
+
+    <style>
+      {% block css%} {% endblock %}
+    </style>
+  </head>
+  <body>
+  {% load static %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="/shop/">My Awesome Cart</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/shop/">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/shop/about">About us</a>
+      </li><li class="nav-item">
+        <a class="nav-link" href="/shop/tracker">Tracker</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/shop/contact">Contact us</a>
+
+
+
+
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+
+        <button type="button" class="btn btn-secondary mx-2" id="popcart" data-container="body" data-toggle="popover" data-placement="bottom"
+                data-html="true" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">
+           Cart (<span id="cart">0</span>)
+        </button>
+  </div>
+</nav>
+    {% block body%} {% endblock %}
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+  
+  {% load static %}
+  <script>
+        // Find Out the cart Items(dictionary) from local storage
+        console.log("Working");
+        if(localStorage.getItem('cart') == null){
+        var cart = {}; // dictionary
+        }
+        else{
+        // Dictionary to store cart from localstorage
+        var cart = JSON.parse(localStorage.getItem('cart'));
+        // to display no. of items in cart (eg. cart(15) )
+        
+          itemTotal();
+        //document.getElementById('cart').innerHTML = Object.keys(cart).length;
+         updateCart(cart);
+        
+        }
+
+        //JQuery
+        // Selecting a cart having class 'cart' , then this function will run
+        // If the add to cart button is clicked, add/increment the item
+
+
+        $('.cart').click(function(){
+             console.log('clicked');
+             // Jis button ko click kia, uski id hum idstr me store karlenge
+             var idstr = this.id.toString();
+             console.log(idstr);
+             // Agar cart me hai vo item jisme user ne click kia ha
+             if(cart[idstr] != undefined){
+              cart[idstr][0] = cart[idstr][0] + 1;
+             }
+             else{
+              // Agar cart me nahi hai vo item jisme user ne click kia ha
+              qty = 1;
+              name = document.getElementById("name"+idstr).innerHTML;
+              cart[idstr] = [qty, name];
+             }
+             updateCart(cart);
+             // we store that data in local storage , so when we moe to other site,
+             // then we can fetch this data
+             localStorage.setItem('cart', JSON.stringify(cart));
+             console.log(cart);
+             location.reload();
+        });
+        // If plus or minus is clicked, change the cart as well as the display value
+        $('.minus').click(function(){
+          // extracting id by removing first 5 letters
+          // minuspr5 => pr5
+          let ide = this.id.toString().slice(5);
+          console.log("remove",ide);
+          
+          //If only one item is left then we will change span to normal(Add to Cart button)
+          if(cart[ide][0]==1){
+            let s = "<button id='"+ide+"' class='btn btn-primary cart'>Add to cart</button>";
+            document.getElementById("div"+ide).innerHTML = s;
+            delete cart[ide];
+            location.reload();
+          }
+          else{
+
+            cart[ide][0] -= 1;
+            document.getElementById("val"+ide).innerHTML = cart[ide][0];
+          }
+          console.log(cart);
+          localStorage.setItem('cart', JSON.stringify(cart));
+          updatepopover(cart);
+          itemTotal();
+        });
+        //Or we can write
+        // $('.divpr').on("click", "button.plus",function(){})
+        // it mean , agar koi span (class=divpr)  ke andar button ko click krta hai , jiski class plus hai, tab
+        $('.plus').click(function(){
+          // extracting id by removing first 4 letters
+          // pluspr7 => pr7
+          let ide = this.id.toString().slice(4);
+          console.log("plus clicked",ide);
+          console.log(cart);
+          cart[ide][0] += 1;
+          document.getElementById("val"+ide).innerHTML = cart[ide][0];
+          localStorage.setItem('cart', JSON.stringify(cart));
+          console.log(cart);
+          updatepopover(cart);
+          itemTotal();
+        });
+
+        // Add popover to cart
+        $('#popcart').click(function(){
+          updatepopover(cart);
+          $('#popcart').popover('show');
+        })
+        
+        // Displaying items in side cart (popover)
+        function updatepopover(cart){
+
+          console.log("we are inside popover");
+          let popStr = "";
+          popStr += "<h3>Items List :- </h3>";
+          for (var item in cart){
+              popStr += document.getElementById('name'+item).innerHTML+" : "+cart[item][0]+"</br>";
+          }
+          popStr = "<b><h4>"+ popStr + "</h4></b><br>";
+          // Adding clear cart and Checkout button in popover
+          
+          popStr += "<button class='btn btn-primary' onclick='clearcart()' id ='clearCart'>Clear Cart</button> <a href='/shop/checkout'><button class='btn btn-primary' id ='checkout'>Checkout</button></a> "
+          document.getElementById("popcart").setAttribute('data-content', popStr);
+          
+        }
+        function clearcart(){
+          
+          for(item in cart){
+            document.getElementById("div"+item).innerHTML = '<button id="'+item+'" class="btn btn-primary cart">Add to cart</button>';
+          }
+          localStorage.removeItem('cart');
+          cart = {}
+          updateCart(cart);
+          updatepopover(cart);
+          itemTotal();
+          location.reload();
+        }
+        function updateCart(cart){
+          console.log(cart);
+          for(item in cart){
+            let s1 = "<button id='minus"+item+"' class= 'btn btn-primary minus mx-2'>-</button> <span id='val"+item+"''><b>" +cart[item][0]+ "</b></span><button id ='plus"+item+"' class='bt btn-primary plus mx-2'>+</button>";
+
+            document.getElementById("div"+item).innerHTML = s1;
+            
+          }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            console.log(cart);
+            updatepopover(cart);
+            //location.reload();
+        }
+         // Function to display total no. of items inside cart
+        function itemTotal(){
+          var summed = sum( cart );
+
+              function sum( obj ) {
+                var sum = 0;
+                for( var el in obj ) {
+                  if( obj.hasOwnProperty( el ) ) {
+                    sum += parseFloat( obj[el] );
+                  }
+                }
+                return sum;
+              }
+          console.log( "sum: "+summed );
+          document.getElementById('cart').innerHTML = summed;
+        }
+        
+        
+        </script>
+        {% block js%} {% endblock %}
+  </body>
+</html>

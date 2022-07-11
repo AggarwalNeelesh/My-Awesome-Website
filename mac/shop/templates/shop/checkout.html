@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <title> Check Out </title>
+
+    <style>
+      
+    </style>
+  </head>
+  <body>
+  {% load static %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="/shop/">My Awesome Cart</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/shop/">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/shop/about">About us</a>
+      </li><li class="nav-item">
+        <a class="nav-link" href="/shop/tracker">Tracker</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/shop/contact">Contact us</a>
+
+
+
+
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+
+        <button type="button" class="btn btn-secondary mx-2" id="popcart" data-container="body" data-toggle="popover" data-placement="bottom"
+                data-html="true" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">
+           Cart (<span id="cart">0</span>)
+        </button>
+  </div>
+</nav>
+<div class="container">
+    <div class="col my-4">
+        <h2> Step 1 - My Awesome Cart Express Checkout - Review Your Cart items </h2>
+        <div id='items'>
+            <ul class="list-group" id="checkoutList">
+                 
+            </ul>
+        </div>
+    </div>
+    <div class="col my-4">
+        <h2> Step 2 - Enter Address & Other Details</h2>
+
+        <form method="post" action="/shop/checkout/" >{% csrf_token %}
+            <input type="hidden" name="itemsJson" id="itemsJson" >
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="name">Name</label>
+                    <input type="name" class="form-control" id="name" name="name" placeholder="Name" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="inputEmail4">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputAddress">Address</label>
+                <input type="text" class="form-control" id="Address" name="Address" placeholder="1234 Main St" required>
+            </div>
+            <div class="form-group">
+                <label for="inputAddress2">Address Line 2</label>
+                <input type="text" class="form-control" id="Address2" name="Address2" placeholder="Apartment, studio, or floor">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="inputCity">City</label>
+                    <input type="text" class="form-control" id="City" name="City" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="inputState">State</label>
+                    <input type="text" class="form-control" id="state" name="state" placeholder="Enter State" required>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="inputZip">Zip</label>
+                    <input type="text" class="form-control" id="inputZip" name="inputZip" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputZip">Phone Number</label>
+                <input type="tel" class="form-control" id="inputPhone" name="inputPhone" required>
+            </div>
+            <button type="submit" onclick="thankyou()" class="btn btn-primary">Place Order</button>
+        </form>
+    </div>
+</div>
+   
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+  
+  {% load static %}
+  <script>
+        var sum = 0;
+         if(localStorage.getItem('cart') == null){
+        var cart = {};
+        }
+        else{
+            var cart = JSON.parse(localStorage.getItem('cart'));
+        }
+        function updateItemsList(){
+            document.getElementById('checkoutList').innerHTML = '';
+            if($.isEmptyObject(cart)){
+                s =  "<p>Your cart is Empty. Please Choose some items for checkout !</p>"
+                    $('#checkoutList').append(s);
+                    alert("Your Cart is Empty. PLease Buy some Items")
+                    document.location = '/shop/'
+            }
+            else{
+                for(item in cart){
+                    let name = cart[item][1];
+                    let qty = cart[item][0];
+                    sum += qty;
+                    s =  `<li class="list-group-item d-flex justify-content-between align-items-center">${name}<span class="badge badge-primary badge-pill">${qty}</span></li>`
+                    $('#checkoutList').append(s);
+
+                }
+            }
+        }
+        updateItemsList();
+        document.getElementById('cart').innerHTML = sum;
+        
+        
+        $('#itemsJson').val(JSON.stringify(cart));
+        {% if thanks %}
+        alert("Thanks for Shoping through My Awesome Cart.You Order Id is {{orderid}} We wish to see you again !")
+        localStorage.removeItem('cart')
+        document.location = "/shop/"
+        {% endif %}
+
+        </script>
+        
+  </body>
+</html>
+

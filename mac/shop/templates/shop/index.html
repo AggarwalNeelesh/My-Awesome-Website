@@ -1,0 +1,151 @@
+{% extends 'shop/basic.html' %}
+
+{% block title%} Shop {% endblock %}
+    {% block css%}
+        .col-md-3 {
+            display: inline-block;
+            margin-left: -4px;
+        }
+
+        .card-img-top {
+            height: 210px;
+            width: 100%;
+            border-top-left-radius: calc(0.25rem - 1px);
+            border-top-right-radius: calc(0.25rem - 1px);
+        }
+        .col-md-3 {
+            width: auto;
+            height: auto;
+        }
+
+        body .carousel-control-indicator li {
+            background-color: blue;
+        }
+
+        .carousel-control-prev ,
+        .carousel-control-next{
+            background-color: ;
+            padding-top: 227px;
+            top: auto;
+            bottom: auto;
+        }
+
+        body .no-padding {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .carousel-control-prev-icon {
+            background: black no-repeat center center;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3e%3cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3e%3c/svg%3e");
+        }
+
+        .carousel-control-next-icon {
+            background: black no-repeat center center;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3e%3cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3e%3c/svg%3e");
+
+        }
+
+        body .carousel-indicators{
+        bottom:0;
+        }
+
+        .carousel-indicators .active{
+        background-color: blue;
+        }
+{% endblock %}
+
+ {% block body%}
+{% load static %}
+
+     <div class="container">
+         {% for product, range, nSlides in allProds %}
+         <h3 class="my-4 ">{{product.0.category}} - Recommended for you</h3>
+        <div class="row">
+         <!--  Slide Show Starts here  -->
+
+        <div id="demo{{forloop.counter}}" class="col carousel slide my-3 " data-ride="carousel">
+            <ul class="carousel-indicators">
+              <!--  Active List item will remain same      -->
+              <li data-target="#demo{{forloop.counter}}" data-slide-to="0" ></li>
+                {% for i in range %}
+                <!-- i = 1,2,3      -->
+              <li data-target="#demo{{forloop.parentloop.counter}}" data-slide-to="{{i}}" ></li>
+                {% endfor %}
+            </ul>
+
+             <div class="container carousel-inner no-padding ">
+            <!--It is slide which contains 4 items-->
+                <div class="carousel-item active">
+                  <!-- We will start from here creating for loop-->
+                  <!-- This Loop is for changing slides -->
+                  {% for i in product %}
+
+                      <!--we are changing slides here , if 4 items are traversed we will change slide
+                          by closing previous slide and opening another slide
+                          forloop.counter is indexed 1 , means start with index 1-->
+
+                         <!-- displaying item -->
+                        <div class="col-xs-3 col-sm-3 col-md-3">
+                          <div class="card align-items-center" style="width: 18rem;">
+                            <img src=' /media/{{i.image}} ' class="card-img-top" alt="...">
+                            <div class="card-body">
+                              <h5 class="card-title" id="namepr{{i.id}}">{{i.product_name}}</h5>
+                              <p class="card-text">{{i.desc}}</p>
+                                <!-- Quick View-->
+                              <a href="/shop/productView/{{i.id}}">
+                                  <button id="qv{{i.id}}"  class="btn btn-primary mx-2">Quick View</button>
+                              </a>
+
+                              <span id="divpr{{i.id}}" class'divpr'>
+                                <button id="pr{{i.id}}" class="btn btn-primary cart">Add to cart</button>
+                              </span>
+
+                            </div>
+                          </div>
+                        </div>
+                             {% if forloop.counter|divisibleby:4 and not forloop.last %}
+                           <!-- closing previous carousel-item-active -->
+                           </div>
+                           <!-- starting  carousel-item -->
+                           <div class="carousel-item ">
+                             {% endif %}
+                  {% endfor %}
+
+              </div>
+
+      </div>
+
+    </div>
+    <a class="carousel-control-prev " href="#demo{{forloop.counter}}" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#demo{{forloop.counter}}" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+         </div>
+{% endfor %}
+
+</div>
+
+{% endblock %}
+
+<!-- {% block js%}
+            <script>
+            if(localStorage.getItem('cart') == null){
+                var cart1 = {}; // dictionary
+            }
+            else{
+                // Dictionary to store cart from localstorage
+                var cart1 = JSON.parse(localStorage.getItem('cart'));
+                // to display no. of items in cart (eg. cart(15) )
+
+                  itemTotal();
+                //document.getElementById('cart').innerHTML = Object.keys(cart).length;
+                 //updateCart(cart1);
+            }
+            
+            </script>
+{% endblock %} -->
